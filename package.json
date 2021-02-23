@@ -1,10 +1,11 @@
 {
   "name": "homework2",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "This is homework2",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "./node_modules/.bin/eslint src/**/*.js --fix"
   },
   "repository": {
     "type": "git",
@@ -15,7 +16,7 @@
   },
   "homepage": "https://github.com/JBringard/Homework2#readme",
   "keywords": [],
-  "author": "",
+  "author": "Gerard Bringard",
   "license": "ISC",
   "dependencies": {
     "bob-mongoose-currency": "^0.2.1",
@@ -24,7 +25,7 @@
     "mongoose": "^5.11.15"
   },
   "devDependencies": {
-    "eslint": "7.19.0",
+    "eslint": "^7.20.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
   }
