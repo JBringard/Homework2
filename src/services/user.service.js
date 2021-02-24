@@ -1,7 +1,7 @@
 const User = require('../models/user.model');
 
-exports.getUsers = async function (request, response) {
-  response.json(await User.find(request.query).select('-_id -__v'));
+exports.getUsers = async function (request) {
+  return User.find(request.query).select('-_id -__v');
 };
 exports.getUser = async function (request, response) {
   const getResult = await User.findOne({ SSN: request.params.SSN }).select('-_id -__v');

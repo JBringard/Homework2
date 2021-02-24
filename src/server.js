@@ -1,6 +1,8 @@
 const Express = require('express');
 const BodyParser = require('body-parser');
 const Mongoose = require('mongoose');
+const UserRoutes = require('./routes/user.routes');
+const ProductRoutes = require('./routes/product.routes');
 
 const Product = require('./models/product.model');
 

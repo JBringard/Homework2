@@ -1,8 +1,7 @@
 const Express = require('express');
 
-const UserController = require('../controllers/user.controller');
-
 const router = Express.Router();
+const UserController = require('../controllers/user.controller');
 
 router.get('/users', UserController.getUsers);
 
