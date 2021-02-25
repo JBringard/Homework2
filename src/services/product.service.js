@@ -1,49 +1,35 @@
 const Product = require('../models/product.model');
 
-exports.getProducts = async function (request, response) {
-  response.json(await Product.find(request.query).select('-_id -__v'));
+exports.retrieveProducts = async function (filter) {
+  return Product.find(filter).select('-_id -__v');
 };
-exports.getProduct = async function (request, response) {
-  const getResult = await Product.findOne({ sku: request.params.sku }).select('-_id -__v');
-  if (getResult != null) {
-    response.json(getResult);
-  } else {
-    response.sendStatus(404);
-  }
+exports.retrieveProduct = async function (filter) {
+  return Product.findOne({ sku: filter }).select('-_id -__v');
 };
-exports.postProduct = async function (request, response) {
-  await new Product(request.body).save();
-  response.sendStatus(201);
+exports.createProduct = async function (productSent) {
+  await new Product(productSent).save();
 };
-exports.deleteProducts = async function (request, response) {
-  response.sendStatus((await Product.deleteMany(request.query)).deletedCount > 0 ? 200 : 404);
+exports.deleteProducts = async function (filter) {
+  return Product.deleteMany(filter).deletedCount;
 };
-exports.deleteProduct = async function (request, response) {
-  response.sendStatus((await Product.deleteOne({
-    sku: request.params.sku,
-  })).deletedCount > 0 ? 200 : 404);
+exports.deleteProduct = async function (filter) {
+  return Product.deleteOne({ sku: filter }).deletedCount;
 };
-exports.putProduct = async function (request, response) {
-  const { sku } = request.params;
-  const product = request.body;
+exports.replaceProduct = async function (params, productSent) {
+  const { sku } = params;
+  const product = productSent;
   product.sku = sku;
   await Product.findOneAndReplace({ sku }, product, {
     upsert: true,
   });
-  response.sendStatus(200);
 };
-exports.patchProduct = async function (request, response) {
-  const { sku } = request.params;
-  const product = request.body;
+exports.updateProduct = async function (params, productSent) {
+  const { sku } = params;
+  const product = productSent;
   delete product.sku;
-  const patchResult = await Product
+  return Product
     .findOneAndUpdate({ sku }, product, {
       new: true,
     })
     .select('-_id -__v');
-  if (patchResult != null) {
-    response.json(patchResult);
-  } else {
-    response.sendStatus(404);
-  }
 };

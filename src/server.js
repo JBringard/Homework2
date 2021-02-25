@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Express = require('express');
 const BodyParser = require('body-parser');
 const Mongoose = require('mongoose');
@@ -92,7 +93,7 @@ app.patch('/products/:sku', async (request, response) => {
 });
 
 (async () => {
-  await Mongoose.connect('mongodb+srv://admin:admin@cluster0-cde82.mongodb.net/mongodb?retryWrites=true&w=majority', {
+  await Mongoose.connect(process.env.CONNECTION, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,

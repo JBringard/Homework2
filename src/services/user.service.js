@@ -1,49 +1,35 @@
 const User = require('../models/user.model');
 
-exports.getUsers = async function (request) {
-  return User.find(request.query).select('-_id -__v');
+exports.retrieveUsers = async function (filter) {
+  return User.find(filter).select('-_id -__v');
 };
-exports.getUser = async function (request, response) {
-  const getResult = await User.findOne({ SSN: request.params.SSN }).select('-_id -__v');
-  if (getResult != null) {
-    response.json(getResult);
-  } else {
-    response.sendStatus(404);
-  }
+exports.retrieveUser = async function (filter) {
+  return User.findOne({ SSN: filter }).select('-_id -__v');
 };
-exports.postUser = async function (request, response) {
-  await new User(request.body).save();
-  response.sendStatus(201);
+exports.createUser = async function (userSent) {
+  await new User(userSent).save();
 };
-exports.deleteUsers = async function (request, response) {
-  response.sendStatus((await User.deleteMany(request.query)).deletedCount > 0 ? 200 : 404);
+exports.deleteUsers = async function (filter) {
+  return User.deleteMany(filter).deletedCount;
 };
-exports.deleteUser = async function (request, response) {
-  response.sendStatus((await User.deleteOne({
-    SSN: request.params.SSN,
-  })).deletedCount > 0 ? 200 : 404);
+exports.deleteUser = async function (filter) {
+  return User.deleteOne({ SSN: filter }).deletedCount;
 };
-exports.putUser = async function (request, response) {
-  const { SSN } = request.params;
-  const user = request.body;
+exports.replaceUser = async function (params, userSent) {
+  const { SSN } = params;
+  const user = userSent;
   user.SSN = SSN;
   await User.findOneAndReplace({ SSN }, user, {
     upsert: true,
   });
-  response.sendStatus(200);
 };
-exports.patchUser = async function (request, response) {
-  const { SSN } = request.params;
-  const user = request.body;
+exports.updateUser = async function (params, userSent) {
+  const { SSN } = params;
+  const user = userSent;
   delete user.SSN;
-  const patchResult = await User
+  return User
     .findOneAndUpdate({ SSN }, user, {
       new: true,
     })
     .select('-_id -__v');
-  if (patchResult != null) {
-    response.json(patchResult);
-  } else {
-    response.sendStatus(404);
-  }
 };

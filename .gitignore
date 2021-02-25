@@ -105,3 +105,6 @@ dist
 
 #JetBrain WebStorm
 .idea/
+
+#Environment Variables
+.env
