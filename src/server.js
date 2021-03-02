@@ -1,3 +1,12 @@
+/*
+Gerard Bringard
+Homework2
+This project in an API that deals with
+products and users. It connects to a
+MongoDB cluster and then has the ability
+to handle GET, POST, PUT, PATCH, and DELETE
+requests for products and users.
+ */
 require('dotenv').config();
 const Express = require('express');
 const BodyParser = require('body-parser');
@@ -5,92 +14,11 @@ const Mongoose = require('mongoose');
 const UserRoutes = require('./routes/user.routes');
 const ProductRoutes = require('./routes/product.routes');
 
-const Product = require('./models/product.model');
-
 const app = Express();
-
+app.use(BodyParser.urlencoded({ extended: true }));
 app.use(BodyParser.json());
-
-const doActionThatMightFailValidation = async (request, response, action) => {
-  try {
-    await action();
-  } catch (e) {
-    response.sendStatus(
-      e.code === 11000
-      || e.stack.includes('ValidationError')
-      || (e.reason !== undefined && e.reason.code === 'ERR_ASSERTION')
-        ? 400 : 500,
-    );
-  }
-};
-
-app.get('/products', async (request, response) => {
-  await doActionThatMightFailValidation(request, response, async () => {
-    response.json(await Product.find(request.query).select('-_id -__v'));
-  });
-});
-
-app.get('/products/:sku', async (request, response) => {
-  await doActionThatMightFailValidation(request, response, async () => {
-    const getResult = await Product.findOne({ sku: request.params.sku }).select('-_id -__v');
-    if (getResult != null) {
-      response.json(getResult);
-    } else {
-      response.sendStatus(404);
-    }
-  });
-});
-
-app.post('/products', async (request, response) => {
-  await doActionThatMightFailValidation(request, response, async () => {
-    await new Product(request.body).save();
-    response.sendStatus(201);
-  });
-});
-
-app.delete('/products', async (request, response) => {
-  await doActionThatMightFailValidation(request, response, async () => {
-    response.sendStatus((await Product.deleteMany(request.query)).deletedCount > 0 ? 200 : 404);
-  });
-});
-
-app.delete('/products/:sku', async (request, response) => {
-  await doActionThatMightFailValidation(request, response, async () => {
-    response.sendStatus((await Product.deleteOne({
-      sku: request.params.sku,
-    })).deletedCount > 0 ? 200 : 404);
-  });
-});
-
-app.put('/products/:sku', async (request, response) => {
-  const { sku } = request.params;
-  const product = request.body;
-  product.sku = sku;
-  await doActionThatMightFailValidation(request, response, async () => {
-    await Product.findOneAndReplace({ sku }, product, {
-      upsert: true,
-    });
-    response.sendStatus(200);
-  });
-});
-
-app.patch('/products/:sku', async (request, response) => {
-  const { sku } = request.params;
-  const product = request.body;
-  delete product.sku;
-  await doActionThatMightFailValidation(request, response, async () => {
-    const patchResult = await Product
-      .findOneAndUpdate({ sku }, product, {
-        new: true,
-      })
-      .select('-_id -__v');
-    if (patchResult != null) {
-      response.json(patchResult);
-    } else {
-      response.sendStatus(404);
-    }
-  });
-});
+app.use('/users', UserRoutes);
+app.use('/products', ProductRoutes);
 
 (async () => {
   await Mongoose.connect(process.env.CONNECTION, {

@@ -1,9 +1,8 @@
 module.exports = {
 
-  async checkValidation(error) {
-    if (error.code === 11000
-        || error.stack.includes('ValidationError')
-        || (error.reason !== undefined && error.reason.code === 'ERR_ASSERTION')) {
+  checkError(e) {
+    if (e.code === 11000 || e.stack.includes('ValidationError')
+      || (e.reason !== undefined && e.reason.code === 'ERR_ASSERTION')) {
       return 400;
     }
     return 500;
@@ -11,25 +10,26 @@ module.exports = {
 
   async doActionThatMightFailValidation(request, response, action) {
     try {
-      await response.json(action());
+      response.json(await action());
     } catch (e) {
-      await response.sendStatus(this.checkValidation(e));
+      response.sendStatus(this.checkError(e));
     }
   },
 
   async deleteValidation(request, response, action) {
     try {
-      if (await action() > 0) {
+      const result = await action();
+      if (result > 0) {
         response.sendStatus(200);
       } else {
         response.sendStatus(404);
       }
     } catch (e) {
-      await response.sendStatus(this.checkValidation(e));
+      response.sendStatus(this.checkError(e));
     }
   },
 
-  async checkIfResultIsNullValidation(request, response, action) {
+  async checkIfResultIsNull(request, response, action) {
     try {
       const result = await action();
       if (result != null) {
@@ -38,7 +38,7 @@ module.exports = {
         response.sendStatus(404);
       }
     } catch (e) {
-      await response.sendStatus(this.checkValidation(e));
+      response.sendStatus(this.checkError(e));
     }
   },
 
@@ -47,7 +47,7 @@ module.exports = {
       await action();
       response.sendStatus(201);
     } catch (e) {
-      await response.sendStatus(this.checkValidation(e));
+      response.sendStatus(this.checkError(e));
     }
   },
 
@@ -56,7 +56,7 @@ module.exports = {
       await action();
       response.sendStatus(200);
     } catch (e) {
-      await response.sendStatus(this.checkValidation(e));
+      response.sendStatus(this.checkError(e));
     }
   },
 };

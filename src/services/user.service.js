@@ -3,18 +3,23 @@ const User = require('../models/user.model');
 exports.retrieveUsers = async function (filter) {
   return User.find(filter).select('-_id -__v');
 };
+
 exports.retrieveUser = async function (filter) {
   return User.findOne({ SSN: filter }).select('-_id -__v');
 };
+
 exports.createUser = async function (userSent) {
   await new User(userSent).save();
 };
+
 exports.deleteUsers = async function (filter) {
-  return User.deleteMany(filter).deletedCount;
+  return (await User.deleteMany(filter)).deletedCount;
 };
+
 exports.deleteUser = async function (filter) {
-  return User.deleteOne({ SSN: filter }).deletedCount;
+  return (await User.deleteOne({ SSN: filter })).deletedCount;
 };
+
 exports.replaceUser = async function (params, userSent) {
   const { SSN } = params;
   const user = userSent;
@@ -23,6 +28,7 @@ exports.replaceUser = async function (params, userSent) {
     upsert: true,
   });
 };
+
 exports.updateUser = async function (params, userSent) {
   const { SSN } = params;
   const user = userSent;
